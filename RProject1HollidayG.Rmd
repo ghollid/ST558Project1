@@ -116,9 +116,42 @@ Ratings
 
 ```
 
-#### Average Runtime by Genre
+#### Runtime by Genre with **Runtime**
 
-This function is used to explore the average runtime by genre 
+This function is used to explore the average run-time by genre (between movies presented by the user, it is not intended to be representative of all movies).
+```{r, echo=TRUE}
+m <- c("Titanic","Avengers: Endgame","Gone with the Wind", "One Direction: This Is Us")
+RuntimeD <- function(Title){
+    Title <- gsub(" ", "+", Title)
+    url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
+    data <- GET(url)
+    # converting raw data to character
+    data = rawToChar(data$content)
+    # converting character to json format
+    jsondata = fromJSON(data)
+    # Putting news title gross earnings, and year into R object
+    tgy <- c(jsondata$Title,as.numeric(substr(jsondata$Runtime,1,3)),jsondata$Genre)
+    return(tgy)
+}
+Runtimes <- function(Movies){
+  x <- data.frame(matrix(NA,nrow=length(Movies),ncol=3))
+  for(i in 1:length(Movies)){
+      
+     x[i,] <- RuntimeD(Movies[i])
+  }
+  x <- x[order(as.numeric(x$X2),na.last=TRUE,decreasing=TRUE),]
+  colnames(x)[1] <- 'Title'
+  colnames(x)[2] <- 'Runtime'
+  colnames(x)[3] <- 'Genre(s)'
+  return(x)
+  }
+  
+Runtime <- Runtimes(m)
+Runtime
+```
+
+#### 
+
 ### Data Manipulation
 
 ### Wrap-Up
