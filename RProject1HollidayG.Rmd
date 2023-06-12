@@ -19,9 +19,9 @@ data from an API (Application Programming Interface). I will be interacting
 with the Open Movie Database API (OMDb).  I will build several functions 
 comprised of a six endpoints and demonstrate some basic data manipulation. 
 
-Endpoints include: Highest Grossing Movie in a given List of Movies,IMDb ID and plot, Movie Title and Year of Release, 
-type (movie, series, episode) and Movie Title , plot(short or full) and Movie
-Title, plot and type, or IMDB ID and Year of Release.
+Endpoints include: Highest Grossing Movie, Highest Average Movie Rating,
+Runtime by Genre, Viewing Movie Posters, Oldest Movies, and Movies by Genre
+and Rating (PG, PG-13, etc.)
 
 ### Requirements
 
@@ -40,10 +40,14 @@ and the web.  Notably useful for interacting with a web API.
 
 #### Highest Grossing Movie with **HighGross**
 
-This function takes a vector of several Movie titles and determines which movie was the highest grossing, along with the year of release.  It produces a
+This function takes a vector of several Movie titles and determines which movie
+was the highest grossing, along with the year of release.  It produces a
 data frame ranking the movies from highest to lowest grossing.
 ```{r,echo=TRUE,warning=FALSE}
+## Example vector of movies
 m <- c("Titanic","Iron Man","Avengers: Endgame","Dances with Wolves")
+
+## This is a supporting function to the user-input function below
 Gross <- function(Title){
     Title <- gsub(" ", "+", Title)
     url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
@@ -57,6 +61,7 @@ Gross <- function(Title){
     return(tgy)
 }
 
+## Function for user-input
 HighGross <- function(Movies){
   x <- data.frame(matrix(NA,nrow=length(Movies),ncol=3))
   for(i in 1:length(Movies)){
@@ -67,17 +72,24 @@ HighGross <- function(Movies){
   return(x)
   }
 
+## Example using function
 HighestGrossing <- HighGross(m)
 HighestGrossing
 ```
 
 #### Comparing Metrics of Ratings with **HighestRating**
 
-This function is used to explore the various online movie-rating systems, and the differences in ranking between each system for a given movie.  This function returns a vector including movie title, Internet Movie Database rating, Rotten Tomatoes rating, Metacritic rating, and IMDb rating.  These are
+This function is used to explore the various online movie-rating systems, and 
+the differences in ranking between each system for a given movie.  This 
+function returns a vector including movie title, Internet Movie Database rating, Rotten Tomatoes rating, Metacritic rating, and IMDb rating.  These are
 sorted by highest average score (standardized to a scale out of 100 for each
 rating system).
 ```{r, echo=TRUE}
-m <- c("Titanic","Avengers: Endgame","Gone with the Wind", "One Direction: This Is Us")
+## Example vector of movies
+m <- c("Titanic","Avengers: Endgame","Gone with the Wind", 
+       "One Direction: This Is Us")
+
+## This is a supporting function to the user-input function below
 Ratings <- function(Title){
     Title <- gsub(" ", "+", Title)
     url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
@@ -95,6 +107,8 @@ Ratings <- function(Title){
     tgy <- c(tgy, mean)
     return(tgy)
 }
+
+## User-input function
 HighestRating <- function(Movies){
   x <- data.frame(matrix(NA,nrow=length(Movies),ncol=6))
   for(i in 1:length(Movies)){
@@ -111,6 +125,7 @@ HighestRating <- function(Movies){
   return(x)
   }
   
+## Example function call
 Ratings <- HighestRating(m)
 Ratings
 
@@ -120,7 +135,11 @@ Ratings
 
 This function is used to explore the average run-time by genre (between movies presented by the user, it is not intended to be representative of all movies).
 ```{r, echo=TRUE}
-m <- c("Titanic","Avengers: Endgame","Gone with the Wind", "One Direction: This Is Us")
+## Example vector of movies
+m <- c("Titanic","Avengers: Endgame","Gone with the Wind", 
+       "One Direction: This Is Us")
+
+## This is a supporting function to the user-input function below
 RuntimeD <- function(Title){
     Title <- gsub(" ", "+", Title)
     url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
@@ -130,9 +149,12 @@ RuntimeD <- function(Title){
     # converting character to json format
     jsondata = fromJSON(data)
     # Putting news title gross earnings, and year into R object
-    tgy <- c(jsondata$Title,as.numeric(substr(jsondata$Runtime,1,3)),jsondata$Genre)
+    tgy <- c(jsondata$Title,as.numeric(substr(jsondata$Runtime,1,3)),
+             jsondata$Genre)
     return(tgy)
 }
+
+## User-input function
 Runtimes <- function(Movies){
   x <- data.frame(matrix(NA,nrow=length(Movies),ncol=3))
   for(i in 1:length(Movies)){
@@ -146,15 +168,21 @@ Runtimes <- function(Movies){
   return(x)
   }
   
+## Example function call
 Runtime <- Runtimes(m)
 Runtime
 ```
 
 #### Viewing Movie Posters with **poster**
-This function retrieves the movie poster for a given movie and plots it with the help of r package **imager**.
+
+This function retrieves the movie poster for a given movie and plots it with 
+the help of r package **imager**.
 
 ```{r, echo=TRUE}
+## Example movie vector
 m <- "The Hunger Games: Mockingjay Part 1"
+
+## This is a supporting function to the user-input function below
 posterD <- function(Title){
     Title <- gsub(" ", "+", Title)
     url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
@@ -167,19 +195,29 @@ posterD <- function(Title){
     tgy <- jsondata$Poster
     return(tgy)
 }
+
+## User-input function
 Posters <- function(Movies){
   im <- load.image(posterD(Movies))
   plot(im,axes=FALSE)
 
 }
-  
+ 
+## Example Function Call 
 Poster <- Posters(m)
 ```
 
-#### Oldest Movies (by Release Year) **
+#### Oldest Movies (by Release Year) with **Release**
+
+This function takes an input vector of movies and orders them by release year. 
+It also outputs the title and director of each movie.
 
 ```{r, echo=TRUE}
-m <- c("Titanic","Avengers: Endgame","Gone with the Wind", "One Direction: This Is Us")
+## Example vector of movies
+m <- c("Titanic","Avengers: Endgame","Gone with the Wind", 
+       "One Direction: This Is Us")
+
+## This is a supporting function to the user-input function below
 ReleaseDate <- function(Title){
     Title <- gsub(" ", "+", Title)
     url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
@@ -192,26 +230,68 @@ ReleaseDate <- function(Title){
     tgy <- c(jsondata$Title,as.numeric(jsondata$Year),jsondata$Director)
     return(tgy)
 }
-Runtimes <- function(Movies){
+
+## User-Input function
+Release <- function(Movies){
   x <- data.frame(matrix(NA,nrow=length(Movies),ncol=3))
   for(i in 1:length(Movies)){
       
-     x[i,] <- RuntimeD(Movies[i])
+     x[i,] <- ReleaseDate(Movies[i])
   }
   x <- x[order(as.numeric(x$X2),na.last=TRUE,decreasing=TRUE),]
   colnames(x)[1] <- 'Title'
-  colnames(x)[2] <- 'Runtime'
+  colnames(x)[2] <- 'Release Year'
+  colnames(x)[3] <- 'Director'
+  return(x)
+  }
+  
+## Example Function Call
+ReleaseD <- Release(m)
+ReleaseD
+```
+
+
+#### Movies by Genre and Rating (G, PG, PG-13, R, etc.) with **GenreRate**
+
+```{r, echo=TRUE}
+## Example vectors of movies
+m <- c("Titanic","Avengers: Endgame","Gone with the Wind", 
+       "One Direction: This Is Us")
+
+## This is a supporting function to the user-input function below
+RateD <- function(Title){
+    Title <- gsub(" ", "+", Title)
+    url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
+    data <- GET(url)
+    # converting raw data to character
+    data = rawToChar(data$content)
+    # converting character to json format
+    jsondata = fromJSON(data)
+    # Putting news title gross earnings, and year into R object
+    tgy <- c(jsondata$Title,jsondata$Rated,jsondata$Genre)
+    return(tgy)
+}
+
+## User-input function
+Rate <- function(Movies){
+  x <- data.frame(matrix(NA,nrow=length(Movies),ncol=3))
+  for(i in 1:length(Movies)){
+      
+     x[i,] <- RateD(Movies[i])
+  }
+  x <- x
+  colnames(x)[1] <- 'Title'
+  colnames(x)[2] <- 'Rated'
   colnames(x)[3] <- 'Genre(s)'
   return(x)
   }
   
-Runtime <- Runtimes(m)
-Runtime
+## Example Function Call
+Rates <- Rate(m)
+Rates
 ```
 
-
-#### Movies by Genre and Rating **GenreRate**
-
 ### Data Manipulation
+
 
 ### Wrap-Up
