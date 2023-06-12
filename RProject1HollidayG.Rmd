@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library('httr')
 library('jsonlite')
 library('tidyverse')
-library('jpeg')
+library('imager')
 ```
 
 This document is a vignette designed to introduce retrieving and manipulating
@@ -34,7 +34,7 @@ useful for data manipulation and cleaning.
 2. **jsonlite**: A JSON parser and generator, optimized for statistical data 
 and the web.  Notably useful for interacting with a web API.
 
-3. **jpeg**: Useful for loading and plotting of jpeg images.
+3. **imager**: Useful for loading and plotting images.
 
 ### API Interaction Functions
 
@@ -148,6 +148,32 @@ Runtimes <- function(Movies){
   
 Runtime <- Runtimes(m)
 Runtime
+```
+
+#### Viewing Movie Posters with **poster**
+This function retrieves the movie poster for a given movie and plots it with the help of r package **imager**.
+
+```{r, echo=TRUE}
+m <- "The Hunger Games: Mockingjay Part 1"
+posterD <- function(Title){
+    Title <- gsub(" ", "+", Title)
+    url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
+    data <- GET(url)
+    # converting raw data to character
+    data = rawToChar(data$content)
+    # converting character to json format
+    jsondata = fromJSON(data)
+    # Putting news title gross earnings, and year into R object
+    tgy <- jsondata$Poster
+    return(tgy)
+}
+Posters <- function(Movies){
+  im <- load.image(posterD(Movies))
+  plot(im,axes=FALSE)
+
+}
+  
+Poster <- Posters(m)
 ```
 
 #### 
