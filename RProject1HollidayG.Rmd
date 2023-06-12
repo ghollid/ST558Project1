@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library('httr')
 library('jsonlite')
 library('tidyverse')
+library('jpeg')
 ```
 
 This document is a vignette designed to introduce retrieving and manipulating
@@ -29,13 +30,17 @@ manipulation from the OMDb API:
 
 1. **tidyverse**: A collection of R packages for data science,arguably most 
 useful for data manipulation and cleaning.
+
 2. **jsonlite**: A JSON parser and generator, optimized for statistical data 
 and the web.  Notably useful for interacting with a web API.
 
+3. **jpeg**: Useful for loading and plotting of jpeg images.
+
 ### API Interaction Functions
 
-#### Highest Grossing Movie
-This function takes a vector of several Movie Titles and determines which movie was the highest grossing, along with the year of release.  It produces a
+#### Highest Grossing Movie with **HighGross**
+
+This function takes a vector of several Movie titles and determines which movie was the highest grossing, along with the year of release.  It produces a
 data frame ranking the movies from highest to lowest grossing.
 ```{r,echo=TRUE,warning=FALSE}
 m <- c("Titanic","Iron Man","Avengers: Endgame","Dances with Wolves")
@@ -62,11 +67,58 @@ HighGross <- function(Movies){
   return(x)
   }
 
-
-t <- HighGross(m)
-t
+HighestGrossing <- HighGross(m)
+HighestGrossing
 ```
 
+#### Comparing Metrics of Ratings with **HighestRating**
+
+This function is used to explore the various online movie-rating systems, and the differences in ranking between each system for a given movie.  This function returns a vector including movie title, Internet Movie Database rating, Rotten Tomatoes rating, Metacritic rating, and IMDb rating.  These are
+sorted by highest average score (standardized to a scale out of 100 for each
+rating system).
+```{r, echo=TRUE}
+m <- c("Titanic","Avengers: Endgame","Gone with the Wind", "One Direction: This Is Us")
+Ratings <- function(Title){
+    Title <- gsub(" ", "+", Title)
+    url <- paste("https://www.omdbapi.com/?t=",Title,"&apikey=82725ca8",sep="")
+    data <- GET(url)
+    # converting raw data to character
+    data = rawToChar(data$content)
+    # converting character to json format
+    jsondata = fromJSON(data)
+    # Putting news title gross earnings, and year into R object
+    tgy <- c(jsondata$Title,jsondata$Ratings[1,2],jsondata$Ratings[2,2],
+             jsondata$Metascore,jsondata$imdbRating)
+    mean <- mean(as.numeric(substr(tgy[2],1,3))*10,
+              as.numeric(substr(tgy[3],1,2)), as.numeric(tgy[4]),
+              as.numeric(tgy[5])*10)
+    tgy <- c(tgy, mean)
+    return(tgy)
+}
+HighestRating <- function(Movies){
+  x <- data.frame(matrix(NA,nrow=length(Movies),ncol=6))
+  for(i in 1:length(Movies)){
+      
+     x[i,] <- Ratings(Movies[i])
+  }
+  x <- x[order(x$X6,na.last=TRUE,decreasing=TRUE),]
+  colnames(x)[1] <- 'Title'
+  colnames(x)[2] <- 'Internet Movie Database'
+  colnames(x)[3] <- 'Rotten Tomatoes'
+  colnames(x)[4] <- 'Metacritic'
+  colnames(x)[5] <- 'IMDb Rating'
+  colnames(x)[6] <- 'Average Rating'
+  return(x)
+  }
+  
+Ratings <- HighestRating(m)
+Ratings
+
+```
+
+#### Average Runtime by Genre
+
+This function is used to explore the average runtime by genre 
 ### Data Manipulation
 
 ### Wrap-Up
