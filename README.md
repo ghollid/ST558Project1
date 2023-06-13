@@ -463,10 +463,11 @@ ggplot(data=GrossMov,aes(x = Title, y = y)) + geom_bar(stat="identity",
   ggtitle('Gross Box Office ($) By Movie')
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> This plot
-shows that some movies are far more successful in the box office than
-others. This leads me to wonder if there are factors contributing to the
-success of these movies, such as genre.
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+This plot shows that some movies are far more successful in the box
+office than others. This leads me to wonder if there are factors
+contributing to the success of these movies, such as genre.
 
 I will explore this by retrieving the genre for the list of movies using
 **Rate** and match this with the box office gross using **HighGross**. I
@@ -748,9 +749,10 @@ ggplot(table3, aes(x=ReleaseYearSt)) + geom_histogram(color="purple", fill="whit
   theme_bw()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- --> Looking at
-this data, here I have clearly selected movies that are majority
-produced in the late 1900s and early 2000s.
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+Looking at this data, here I have clearly selected movies that are
+majority produced in the late 1900s and early 2000s.
 
 ### Wrap-Up/Conclusions
 
