@@ -139,7 +139,7 @@ Ratings
 
 ```
 
-#### Runtime by Genre with **Runtime**
+#### Runtime by Genre with **Runtimes**
 
 This function is used to explore the average run-time by genre (between movies presented by the user, it is not intended to be representative of all movies).
 ```{r, echo=TRUE}
@@ -181,7 +181,7 @@ Runtime <- Runtimes(m)
 Runtime
 ```
 
-#### Viewing Movie Posters with **poster**
+#### Viewing Movie Posters with **posters**
 
 This function retrieves the movie poster for a given movie and plots it with 
 the help of r package **imager**.
@@ -235,13 +235,14 @@ ReleaseDate <- function(Title){
     # converting character to json format
     jsondata = fromJSON(data)
     # Putting news title gross earnings, and year into R object
-    tgy <- c(jsondata$Title,as.numeric(jsondata$Year),jsondata$Director)
+    tgy <- c(jsondata$Title,as.numeric(jsondata$Year),jsondata$Director,
+             jsondata$Released)
     return(tgy)
 }
 
 ## User-Input function
 Release <- function(Movies){
-  x <- data.frame(matrix(NA,nrow=length(Movies),ncol=3))
+  x <- data.frame(matrix(NA,nrow=length(Movies),ncol=4))
   for(i in 1:length(Movies)){
       
      x[i,] <- ReleaseDate(Movies[i])
@@ -259,7 +260,7 @@ ReleaseD
 ```
 
 
-#### Movies by Genre and Rating (G, PG, PG-13, R, etc.) with **GenreRate**
+#### Movies by Genre and Rating (G, PG, PG-13, R, etc.) with **Rate**
 
 ```{r, echo=TRUE}
 ## Example vectors of movies
@@ -305,8 +306,8 @@ Now that we have access to all of this data from the movies API, it may be
 interesting to take a look at some simple data analysis using the functions
 previously created.
 
-First, let's create a plot of movies by how well they did in the box office 
-using function **HighGross**.
+#### First, I will do some most basic level exploration by creating 
+contingency tables to explore the data available from these functions.
 ```{r, echo=TRUE}
 # First, create a vector of many movie titles
 mov <- c("Harry Potter and the Chamber of Secrets","Up","The Little Mermaid",
@@ -322,6 +323,32 @@ mov <- c("Harry Potter and the Chamber of Secrets","Up","The Little Mermaid",
          "The Goonies","Home Alone","Independence Day","Kung Fu Panda",
          "Holes")
 
+# Each function starting with HighGross
+Function1 <- HighGross(mov)
+Function2 <- HighestRating(mov)
+Function3 <- Runtimes(mov)
+Function4 <- Posters(mov[1])
+Function5 <- Release(mov)
+Function6 <- Rate(mov)
+
+# Contingency Tables Exploratory Runs
+# Table exploring Movie Ratings by Primary Genre
+table(Function6$Rated,word(Function6$`Genre(s)`,1,sep=','))
+
+# Table exploring Release Year by Rated
+tableint <- merge(Function5,Function6,by.x="Title",by.y="Title")
+table(tableint$`Release Year`,tableint$Rated)
+
+# Table exploring Primary Genre By Release Year
+tableint2 <- merge(Function5, Function3, by.x="Title",by.y="Title")
+table(word(tableint2$`Genre(s)`,1,sep=','),tableint2$`Release Year`)
+
+
+```
+
+#### Next, let's create a plot of movies by how well they did in the box office 
+using function **HighGross**.
+```{r, echo=TRUE}
 # Call function
 GrossMov <- HighGross(mov)
 colnames(GrossMov)[2] <- 'y'
@@ -341,9 +368,9 @@ This plot shows that some movies are far more successful in the box office than
 others.  This leads me to wonder if there are factors contributing to the
 success of these movies, such as genre.
 
-I will explore this by retrieving the genre for the list of movies using 
-**Rate** and match this with the box office gross.  I will then plot the a box
-plot by genre.
+#### I will explore this by retrieving the genre for the list of movies using 
+**Rate** and match this with the box office gross.  I will first explore the distribution of genres with a simple pie chart.  Then I will take a look at 
+some numerical summaries for the gross box office earnings at each level of genre. I will then plot a box plot visualizing box office earnings by genre.
 
 
 ```{r, echo=TRUE}
@@ -365,14 +392,28 @@ Table1$PrimaryGenre <- word(Table1[,5],1,sep=',')
 colnames(Table1)[2] <- 'Gross'
 Table1$Gross <- as.numeric(Table1$Gross)
 
+## Creating pie chart of genres
+x <- plyr::count(Table1$PrimaryGenre)
+slices <- x$freq
+lbls <- c("Action", "Adventure", "Animation", "Comedy", "Drama","Horror")
+pie(slices, labels = lbls, main="Pie Chart of Primary Genres")
+
+## Numerical Summary of Earnings by Genre
+GrossSum <- Table1 %>%                               
+  group_by(PrimaryGenre) %>% 
+  summarize(min = min(Gross),
+            q1 = quantile(Gross, 0.25),
+            median = median(Gross),
+            mean = mean(Gross),
+            q3 = quantile(Gross, 0.75),
+            max = max(Gross))
+GrossSum
+
 ## Now, want to group these observations by genre and plot box plots of 
 ## the box office earnings.
 ggplot(Table1, aes(x=as.factor(PrimaryGenre), y=Gross, fill=as.factor(PrimaryGenre))) + geom_boxplot() + 
     xlab("Primary Genre") + ylab("Gross Box Office ($)") +
-    theme(legend.position = 'none') + ggtitle('Gross Box Office ($) By Genre')
-
-
-
+    theme_bw()+ theme(legend.position = 'none') + ggtitle('Gross Box Office ($) By Genre')
 ```
 
 Looking at this visual, it is interesting to see the differences between the 
@@ -383,8 +424,8 @@ movies (potentially with big companies such as Disney), also seeing relatively
 large box office incomes.  This data does not tell us anything statisically,
 but does show an interesting exploratory analysis.
 
-Next, I found myself interested in the "efficiency" of each movie.  That is,
-I was interested in which movies made the most money per minute of movie (run-time).  To explore this, I will create a new variable that is a function
+#### Next, I found myself interested in the "efficiency" of each movie.  
+That is, I was interested in which movies made the most money per minute of movie (run-time).  To explore this, I will create a new variable that is a function
 of variables from datasets taken using my previously created functions, that 
 will be representative of the efficency/profitability of each movie (dollars earned per minute run time).
 ```{r, echo=TRUE}
@@ -411,14 +452,49 @@ ggplot(table2, aes(x=as.numeric(Runtime),y=as.numeric(productivity),
         scale_color_discrete(name="Primary Genre")+ stat_smooth(method = "lm",
         col = "#C42126",
         se = FALSE,
-        linewidth = 1)
+        linewidth = 1)+ theme_bw()
 ```
 
-Taking a look at this plot, we can see that there does not seem to be much
+Taking a look at these plots, we can see that there does not seem to be much
 of a relationship between run time and productivity (at least not linearly).
 To me, it speculatively seems like the movies that have the highest 
 productivity are more often in the middle range of run-time.
 
+#### Additionally, I wished to explore the number of movies based on when they were released (year).
 
+To do this, I will utilize the previous data and functions to first create a numerical summary of gross profits by release year, and then plot a histogram of gross profits by release year.
+```{r, echo=TRUE}
+## Release Dates
+rd <- Release(mov)
+
+## Gross Profits
+gp <- HighGross(mov)
+
+## merge the two
+table3 <- merge(rd,gp,by.x='Title',by.y='Title')
+table3 <- table3[,-6]
+colnames(table3)[2] <- 'ReleaseYear'
+colnames(table3)[5] <- 'Gross'
+head(table3)
+table3$ReleaseYearSt <- as.Date(ISOdate(table3$ReleaseYear, 1, 1))
+
+## Numerical Summary
+YrGrossSum <- table3 %>%                               
+  group_by(ReleaseYear) %>% 
+  summarize(min = min(as.numeric(Gross)),
+            q1 = quantile(as.numeric(Gross), 0.25),
+            median = median(as.numeric(Gross)),
+            mean = mean(as.numeric(Gross)),
+            q3 = quantile(as.numeric(Gross), 0.75),
+            max = max(as.numeric(Gross)))
+YrGrossSum
+
+## utilize the data to create a time-based histogram
+ggplot(table3, aes(x=ReleaseYearSt)) + geom_histogram(color="purple", fill="white", binwidth = 2000) + xlab('Release Year') + 
+  ylab('Number of Movies') + ggtitle('Number of Movies Releases by Year')+
+  theme_bw()
+```
+Looking at this data, here I have clearly selected movies that are majority 
+produced in the late 1900s and early 2000s.  
 
 ### Wrap-Up
