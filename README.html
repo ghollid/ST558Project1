@@ -909,9 +909,8 @@ Genre and Rating (G, PG, PG-13, R, etc.) with <em>Rate</em></h4>
 <p>Now that we have access to all of this data from the movies API, it
 may be interesting to take a look at some simple data analysis using the
 functions previously created.</p>
-<h4 id="first-i-will-do-some-most-basic-level-exploration-by-creating">First,
-I will do some most basic level exploration by creating</h4>
-<p>contingency tables to explore the data available from these
+<p>First, I will do some most basic level exploration by creating
+contingency tables to explore the data available from these
 functions.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># First, create a vector of many movie titles</span></span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>mov <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Harry Potter and the Chamber of Secrets&quot;</span>,<span class="st">&quot;Up&quot;</span>,<span class="st">&quot;The Little Mermaid&quot;</span>,</span>
@@ -996,10 +995,8 @@ functions.</p>
 ##   Comedy       1    0    0    1    0    0
 ##   Drama        0    0    1    0    0    0
 ##   Horror       0    1    0    1    0    0</code></pre>
-<h4 id="next-lets-create-a-plot-of-movies-by-how-well-they-did-in-the-box-office">Next,
-let’s create a plot of movies by how well they did in the box
-office</h4>
-<p>using function <strong>HighGross</strong>.</p>
+<p>Next, let’s create a plot of movies by how well they did in the box
+office using function <strong>HighGross</strong>.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># Call function</span></span>
 <span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>GrossMov <span class="ot">&lt;-</span> <span class="fu">HighGross</span>(mov)</span>
 <span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="fu">colnames</span>(GrossMov)[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="st">&#39;y&#39;</span></span>
@@ -1017,12 +1014,10 @@ office</h4>
 This plot shows that some movies are far more successful in the box
 office than others. This leads me to wonder if there are factors
 contributing to the success of these movies, such as genre.</p>
-<h4 id="i-will-explore-this-by-retrieving-the-genre-for-the-list-of-movies-using">I
-will explore this by retrieving the genre for the list of movies
-using</h4>
-<p><strong>Rate</strong> and match this with the box office gross using
-<strong>HighGross</strong>. I will first explore the distribution of
-genres with a simple pie chart. Then I will take a look at some
+<p>I will explore this by retrieving the genre for the list of movies
+using <strong>Rate</strong> and match this with the box office gross
+using <strong>HighGross</strong>. I will first explore the distribution
+of genres with a simple pie chart. Then I will take a look at some
 numerical summaries for the gross box office earnings at each level of
 genre. I will then plot a box plot visualizing box office earnings by
 genre.</p>
@@ -1118,12 +1113,12 @@ movies topping the box office, and animation movies (potentially with
 big companies such as Disney), also seeing relatively large box office
 incomes. This data does not tell us anything statisically, but does show
 an interesting exploratory analysis.</p>
-<h4 id="next-i-found-myself-interested-in-the-efficiency-of-each-movie">Next,
-I found myself interested in the “efficiency” of each movie.</h4>
-<p>That is, I was interested in which movies made the most money per
-minute of movie (run-time). To explore this, I will create a new
-variable that is a function of variables from datasets taken using my
-previously created functions, that will be representative of the
+<p>Next, I found myself interested in the “efficiency” of each
+movie.<br />
+That is, I was interested in which movies made the most money per minute
+of movie (run-time). To explore this, I will create a new variable that
+is a function of variables from datasets taken using my previously
+created functions, that will be representative of the
 efficency/profitability of each movie (dollars earned per minute run
 time).</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="do">## pulling runtimes</span></span>
@@ -1187,9 +1182,8 @@ be much of a relationship between run time and productivity (at least
 not linearly). To me, it speculatively seems like the movies that have
 the highest productivity are more often in the middle range of
 run-time.</p>
-<h4 id="additionally-i-wished-to-explore-the-number-of-movies-based-on-when">Additionally,
-I wished to explore the number of movies based on when</h4>
-<p>they were released (year).</p>
+<p>Additionally, I wished to explore the number of movies based on when
+they were released (year).</p>
 <p>To do this, I will utilize the previous data and functions
 <strong>Release</strong> and <strong>HighGross</strong> to first create
 a numerical summary of gross profits by release year, and then plot a
