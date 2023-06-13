@@ -2,8 +2,6 @@
 title: "Interacting with API's - Example with the Open Movie Database API"
 author: "Grace Holliday"
 date: "2023-06-11"
-output: github_document
-  toc: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -134,8 +132,8 @@ HighestRating <- function(Movies){
   }
   
 ## Example function call
-Ratings <- HighestRating(m)
-Ratings
+RatingsEx <- HighestRating(m)
+RatingsEx
 
 ```
 
