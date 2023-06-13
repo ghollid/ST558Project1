@@ -304,7 +304,7 @@ Now that we have access to all of this data from the movies API, it may be
 interesting to take a look at some simple data analysis using the functions
 previously created.
 
-#### First, I will do some most basic level exploration by creating 
+First, I will do some most basic level exploration by creating 
 contingency tables to explore the data available from these functions.
 ```{r, echo=TRUE}
 # First, create a vector of many movie titles
@@ -344,7 +344,7 @@ table(word(tableint2$`Genre(s)`,1,sep=','),tableint2$`Release Year`)
 
 ```
 
-#### Next, let's create a plot of movies by how well they did in the box office 
+Next, let's create a plot of movies by how well they did in the box office 
 using function **HighGross**.
 ```{r, echo=TRUE}
 # Call function
@@ -366,7 +366,7 @@ This plot shows that some movies are far more successful in the box office than
 others.  This leads me to wonder if there are factors contributing to the
 success of these movies, such as genre.
 
-#### I will explore this by retrieving the genre for the list of movies using 
+I will explore this by retrieving the genre for the list of movies using 
 **Rate** and match this with the box office gross using **HighGross**. 
 I will first explore the distribution of genres with a simple pie chart.
 Then I will take a look at some numerical summaries for the gross box office earnings at each level of genre. I will then plot a box plot visualizing 
@@ -422,7 +422,7 @@ work with, and additionally there may be outliers present that are skewing
 the data.  It is still interesting to see that the results are what you may 
 expect,with blockbuster action/adventure movies topping the box office, and animation movies (potentially with big companies such as Disney), also seeing relatively large box office incomes.  This data does not tell us anything statisically, but does show an interesting exploratory analysis.
 
-#### Next, I found myself interested in the "efficiency" of each movie.  
+Next, I found myself interested in the "efficiency" of each movie.  
 That is, I was interested in which movies made the most money per minute of
 movie (run-time).  To explore this, I will create a new variable that is
 a function of variables from datasets taken using my previously created 
@@ -460,7 +460,7 @@ of a relationship between run time and productivity (at least not linearly).
 To me, it speculatively seems like the movies that have the highest 
 productivity are more often in the middle range of run-time.
 
-#### Additionally, I wished to explore the number of movies based on when 
+Additionally, I wished to explore the number of movies based on when 
 they were released (year).
 
 To do this, I will utilize the previous data and functions **Release** and 
