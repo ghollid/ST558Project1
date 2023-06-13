@@ -362,6 +362,7 @@ ggplot(data=GrossMov,aes(x = Title, y = y)) + geom_bar(stat="identity",
   ggtitle('Gross Box Office ($) By Movie')
 
 ```
+
 This plot shows that some movies are far more successful in the box office than
 others.  This leads me to wonder if there are factors contributing to the
 success of these movies, such as genre.
@@ -497,6 +498,7 @@ ggplot(table3, aes(x=ReleaseYearSt)) + geom_histogram(color="purple", fill="whit
   ylab('Number of Movies') + ggtitle('Number of Movies Releases by Year')+
   theme_bw()
 ```
+
 Looking at this data, here I have clearly selected movies that are majority 
 produced in the late 1900s and early 2000s.  
 
