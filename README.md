@@ -30,7 +30,7 @@ manipulation from the OMDb API:
 
 ### API Interaction Functions
 
-#### Highest Grossing Movie with **HighGross**
+#### Highest Grossing Movie with *HighGross*
 
 This function takes a vector of several Movie titles and determines
 which movie was the highest grossing, along with the year of release. It
@@ -83,7 +83,7 @@ HighestGrossing
     ## 3 Iron Man           319034126              2008 
     ## 4 Dances with Wolves 184208848              1990
 
-#### Comparing Metrics of Ratings with **HighestRating**
+#### Comparing Metrics of Ratings with *HighestRating*
 
 This function is used to explore the various online movie-rating
 systems, and the differences in ranking between each system for a given
@@ -147,7 +147,7 @@ RatingsEx
     ## 4 One Direction: This Is Us 4.2/10                 63%               49         4.2           42              
     ## # ℹ abbreviated name: ¹​`Internet Movie Database`
 
-#### Runtime by Genre with **Runtimes**
+#### Runtime by Genre with *Runtimes*
 
 This function is used to explore the average run-time by genre (between
 movies presented by the user, it is not intended to be representative of
@@ -200,7 +200,7 @@ Runtime
     ## 3 Avengers: Endgame         181     Action, Adventure, Drama
     ## 4 One Direction: This Is Us 92      Documentary, Music
 
-#### Viewing Movie Posters with **posters**
+#### Viewing Movie Posters with *Posters*
 
 This function retrieves the movie poster for a given movie and plots it
 with the help of r package **imager**.
@@ -236,7 +236,7 @@ Poster <- Posters(m)
 
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-#### Oldest Movies (by Release Year) with **Release**
+#### Oldest Movies (by Release Year) with *Release*
 
 This function takes an input vector of movies and orders them by release
 year. It also outputs the title and director of each movie.
@@ -288,7 +288,7 @@ ReleaseD
     ## 3 Titanic                   1997           James Cameron                          19 Dec 1997
     ## 4 Gone with the Wind        1939           Victor Fleming, George Cukor, Sam Wood 17 Jan 1940
 
-#### Movies by Genre and Rating (G, PG, PG-13, R, etc.) with **Rate**
+#### Movies by Genre and Rating (G, PG, PG-13, R, etc.) with *Rate*
 
 ``` r
 ## Example vectors of movies
@@ -472,11 +472,11 @@ success of these movies, such as genre.
 
 #### I will explore this by retrieving the genre for the list of movies using
 
-**Rate** and match this with the box office gross. I will first explore
-the distribution of genres with a simple pie chart. Then I will take a
-look at some numerical summaries for the gross box office earnings at
-each level of genre. I will then plot a box plot visualizing box office
-earnings by genre.
+**Rate** and match this with the box office gross using **HighGross**. I
+will first explore the distribution of genres with a simple pie chart.
+Then I will take a look at some numerical summaries for the gross box
+office earnings at each level of genre. I will then plot a box plot
+visualizing box office earnings by genre.
 
 ``` r
 ## Retrieving Movie Genres
@@ -589,11 +589,11 @@ Looking at this visual, it is interesting to see the differences between
 the primary genres. Obviously, we have given the function a small sample
 size to work with, and additionally there may be outliers present that
 are skewing the data. It is still interesting to see that the results
-are what you may expect, with blockbuster action/advernture movies
-topping the box office, and animation movies (potentially with big
-companies such as Disney), also seeing relatively large box office
-incomes. This data does not tell us anything statisically, but does show
-an interesting exploratory analysis.
+are what you may expect,with blockbuster action/adventure movies topping
+the box office, and animation movies (potentially with big companies
+such as Disney), also seeing relatively large box office incomes. This
+data does not tell us anything statisically, but does show an
+interesting exploratory analysis.
 
 #### Next, I found myself interested in the “efficiency” of each movie.
 
@@ -682,11 +682,14 @@ much of a relationship between run time and productivity (at least not
 linearly). To me, it speculatively seems like the movies that have the
 highest productivity are more often in the middle range of run-time.
 
-#### Additionally, I wished to explore the number of movies based on when they were released (year).
+#### Additionally, I wished to explore the number of movies based on when
 
-To do this, I will utilize the previous data and functions to first
-create a numerical summary of gross profits by release year, and then
-plot a histogram of gross profits by release year.
+they were released (year).
+
+To do this, I will utilize the previous data and functions **Release**
+and **HighGross** to first create a numerical summary of gross profits
+by release year, and then plot a histogram of gross profits by release
+year.
 
 ``` r
 ## Release Dates
@@ -754,4 +757,11 @@ ggplot(table3, aes(x=ReleaseYearSt)) + geom_histogram(color="purple", fill="whit
 this data, here I have clearly selected movies that are majority
 produced in the late 1900s and early 2000s.
 
-### Wrap-Up
+### Wrap-Up/Conclusions
+
+This vignette contains several functions to interact with some of the
+OMDb endpoints. Within this vignette, I created these functions, used
+some of them, and explored the data they retrieved with contingency
+tables, numerical summaries, and various types of plots for data
+visualization. I was able to create some interesting functions for those
+curious about movie data.
