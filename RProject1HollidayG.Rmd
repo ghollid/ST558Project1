@@ -12,6 +12,8 @@ library('httr')
 library('jsonlite')
 library('tidyverse')
 library('imager')
+library('ggplot2')
+
 ```
 
 This document is a vignette designed to introduce retrieving and manipulating
@@ -36,6 +38,8 @@ and the web.  Notably useful for interacting with a web API.
 
 3. **imager**: Useful for loading and plotting images.
 
+4. **ggplot2**: Useful for creation of various plots and images.
+
 ### API Interaction Functions
 
 #### Highest Grossing Movie with **HighGross**
@@ -57,7 +61,8 @@ Gross <- function(Title){
     # converting character to json format
     jsondata = fromJSON(data)
     # Putting news title gross earnings, and year into R object
-    tgy <- c(jsondata$Title,jsondata$BoxOffice,jsondata$Year)
+    tgy <- c(jsondata$Title,as.numeric(parse_number(jsondata$BoxOffice)),
+    jsondata$Year)
     return(tgy)
 }
 
@@ -69,6 +74,9 @@ HighGross <- function(Movies){
      x[i,] <- Gross(Movies[i])
   }
   x <- x[order(x$X2,na.last=TRUE,decreasing=TRUE),]
+  colnames(x)[1] <- 'Title'
+  colnames(x)[2] <- 'Gross Box Office ($)'
+  colnames(x)[3] <- 'Year'
   return(x)
   }
 
@@ -292,6 +300,125 @@ Rates
 ```
 
 ### Data Manipulation
+
+Now that we have access to all of this data from the movies API, it may be 
+interesting to take a look at some simple data analysis using the functions
+previously created.
+
+First, let's create a plot of movies by how well they did in the box office 
+using function **HighGross**.
+```{r, echo=TRUE}
+# First, create a vector of many movie titles
+mov <- c("Harry Potter and the Chamber of Secrets","Up","The Little Mermaid",
+         "The Hunger Games","Dances with Wolves","Matilda",
+         "Rogue One: A Star Wars Story","Pitch Perfect","Hook",
+         "Full Metal Jacket","La La Land","Whiplash","The Jungle Book",
+         "Into the Woods","The Patriot","Saving Private Ryan","The Notebook",
+         "Split","The Conjuring","American Pie","Friday the 13th",
+         "Avatar","Step Brothers","Happy Gilmore","The Waterboy",
+         "The Big Lebowski","John Wick","The Breakfast Club","Charlotte's Web",
+         "Gone with the Wind","Avengers: Endgame","Titanic","Finding Nemo",
+         "Harry Potter and the Deathly Hallows: Part 2","Dune","Mamma Mia!",
+         "The Goonies","Home Alone","Independence Day","Kung Fu Panda",
+         "Holes")
+
+# Call function
+GrossMov <- HighGross(mov)
+colnames(GrossMov)[2] <- 'y'
+GrossMov <- as.data.frame(GrossMov)
+GrossMov$y <- as.numeric(GrossMov$y)
+## Create Plot based on this data
+ggplot(data=GrossMov,aes(x = Title, y = y)) + geom_bar(stat="identity",
+    fill='steelblue')+ theme_bw()+
+  theme(axis.text.x=element_text(size=5,angle=45)) +
+  scale_y_continuous(name = "Gross Box Office",
+                     breaks=c(100000000,200000000, 300000000, 400000000,
+                          500000000,600000000,700000000,800000000,850000000)) +
+  ggtitle('Gross Box Office ($) By Movie')
+
+```
+This plot shows that some movies are far more successful in the box office than
+others.  This leads me to wonder if there are factors contributing to the
+success of these movies, such as genre.
+
+I will explore this by retrieving the genre for the list of movies using 
+**Rate** and match this with the box office gross.  I will then plot the a box
+plot by genre.
+
+
+```{r, echo=TRUE}
+## Retrieving Movie Genres
+Genre <- Rate(mov)
+Genre
+
+## Retrieving Box Office Gross
+GrossMov <- HighGross(mov)
+GrossMov
+
+## Matching this data together
+Table1 <- merge(GrossMov,Genre,by.x='Title',by.y='Title')
+head(Table1)
+
+## I will now classify each movie into a single genre, based on the first 
+## genre listed for each movie, to simplify things.
+Table1$PrimaryGenre <- word(Table1[,5],1,sep=',')
+colnames(Table1)[2] <- 'Gross'
+Table1$Gross <- as.numeric(Table1$Gross)
+
+## Now, want to group these observations by genre and plot box plots of 
+## the box office earnings.
+ggplot(Table1, aes(x=as.factor(PrimaryGenre), y=Gross, fill=as.factor(PrimaryGenre))) + geom_boxplot() + 
+    xlab("Primary Genre") + ylab("Gross Box Office ($)") +
+    theme(legend.position = 'none') + ggtitle('Gross Box Office ($) By Genre')
+
+
+
+```
+
+Looking at this visual, it is interesting to see the differences between the 
+primary genres.  Obviously, we have given the function a small sample size to 
+work with, and additionally there may be outliers present that are skewing the data.  It is still interesting to see that the results are what you may expect,
+with blockbuster action/advernture movies topping the box office, and animation
+movies (potentially with big companies such as Disney), also seeing relatively
+large box office incomes.  This data does not tell us anything statisically,
+but does show an interesting exploratory analysis.
+
+Next, I found myself interested in the "efficiency" of each movie.  That is,
+I was interested in which movies made the most money per minute of movie (run-time).  To explore this, I will create a new variable that is a function
+of variables from datasets taken using my previously created functions, that 
+will be representative of the efficency/profitability of each movie (dollars earned per minute run time).
+```{r, echo=TRUE}
+## pulling runtimes
+runs <- Runtimes(mov)
+head(runs)
+## Combining this data with previously generated table 1 that includes gross
+table2 <- merge(Table1,runs,by.x="Title",by.y="Title")
+table2[,-8]
+
+## Creating a new variables in this data frame that is a function of other
+## variables present
+table2$productivity <- as.numeric(table2$Gross)/as.numeric(table2$Runtime)
+
+## viewing the data
+head(table2)
+
+## Now I am going to plot productivity by runtime and see if there is any trend
+## there# Change the point size, and shape
+ggplot(table2, aes(x=as.numeric(Runtime),y=as.numeric(productivity),
+                   color=as.factor(PrimaryGenre))) + geom_point(size=2)+
+        xlab('Runtime (minutes)')+ ylab('Productivity ($/min)') +
+        ggtitle('Productivity by Runtime') + 
+        scale_color_discrete(name="Primary Genre")+ stat_smooth(method = "lm",
+        col = "#C42126",
+        se = FALSE,
+        linewidth = 1)
+```
+
+Taking a look at this plot, we can see that there does not seem to be much
+of a relationship between run time and productivity (at least not linearly).
+To me, it speculatively seems like the movies that have the highest 
+productivity are more often in the middle range of run-time.
+
 
 
 ### Wrap-Up
